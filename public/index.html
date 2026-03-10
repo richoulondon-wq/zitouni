@@ -5,16 +5,15 @@
 
 <meta charset="UTF-8">
 <title>Random Video Chat</title>
-
 <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-<header>
-
 <h1>Random Video Chat</h1>
+
+<div id="status">Idle</div>
 
 <div class="controls">
 
@@ -25,18 +24,16 @@
 
 </div>
 
-</header>
-
 <div class="videos">
 
-<div class="box">
+<div>
 
 <h3>You</h3>
 <video id="localVideo" autoplay muted playsinline></video>
 
 </div>
 
-<div class="box">
+<div>
 
 <h3>Stranger</h3>
 <video id="remoteVideo" autoplay playsinline></video>
@@ -49,13 +46,9 @@
 
 <div id="messages"></div>
 
-<div class="input">
-
-<input id="msg" placeholder="Message">
+<input id="msg" placeholder="Type message">
 
 <button onclick="sendMessage()">Send</button>
-
-</div>
 
 </div>
 

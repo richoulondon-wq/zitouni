@@ -6,25 +6,33 @@ const io = require("socket.io")(http)
 
 app.use(express.static(path.join(__dirname,"public")))
 
-let waiting = null
+let queue = []
 
 io.on("connection",socket=>{
 
+socket.emit("status","Connected")
+
 socket.on("find",()=>{
 
-if(waiting && waiting !== socket){
+queue = queue.filter(s=>s!==socket)
 
-socket.partner = waiting
-waiting.partner = socket
+if(queue.length>0){
+
+const partner = queue.shift()
+
+socket.partner = partner
+partner.partner = socket
 
 socket.emit("matched")
-waiting.emit("matched")
+partner.emit("matched")
 
-waiting = null
+socket.emit("status","Connected")
+partner.emit("status","Connected")
 
 }else{
 
-waiting = socket
+queue.push(socket)
+socket.emit("status","Searching for partner...")
 
 }
 
@@ -35,10 +43,11 @@ socket.on("next",()=>{
 if(socket.partner){
 
 socket.partner.emit("partner-left")
-socket.partner.partner = null
-socket.partner = null
+socket.partner.partner=null
 
 }
+
+socket.partner=null
 
 })
 
@@ -60,13 +69,11 @@ if(socket.partner) socket.partner.emit("message",msg)
 
 socket.on("disconnect",()=>{
 
-if(waiting === socket) waiting = null
+queue = queue.filter(s=>s!==socket)
 
 if(socket.partner){
-
 socket.partner.emit("partner-left")
-socket.partner.partner = null
-
+socket.partner.partner=null
 }
 
 })

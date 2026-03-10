@@ -1,24 +1,19 @@
 body{
-
-margin:0;
 background:#0f172a;
 color:white;
 font-family:Arial;
 text-align:center;
-
 }
 
-header{
-
-background:#020617;
-padding:20px;
-
+#status{
+margin:10px;
+color:#38bdf8;
 }
 
 .controls button{
 
-margin:5px;
 padding:10px 15px;
+margin:5px;
 border:none;
 border-radius:6px;
 background:#2563eb;
@@ -32,15 +27,7 @@ cursor:pointer;
 display:flex;
 justify-content:center;
 gap:40px;
-margin-top:30px;
-
-}
-
-.box{
-
-background:#020617;
-padding:15px;
-border-radius:10px;
+margin-top:20px;
 
 }
 
@@ -49,47 +36,24 @@ video{
 width:320px;
 height:240px;
 background:black;
-border-radius:8px;
+border-radius:10px;
 
 }
 
 .chat{
 
-width:500px;
+width:400px;
 margin:auto;
-margin-top:30px;
+margin-top:20px;
 
 }
 
 #messages{
 
-height:200px;
+height:150px;
 overflow:auto;
 background:#020617;
 padding:10px;
 border-radius:10px;
-
-}
-
-.input{
-
-display:flex;
-margin-top:10px;
-
-}
-
-.input input{
-
-flex:1;
-padding:10px;
-border:none;
-border-radius:5px;
-
-}
-
-.input button{
-
-padding:10px;
-margin-left:5px;
 
 }
