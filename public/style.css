@@ -1,9 +1,9 @@
 body{
 
+margin:0;
 background:#0f172a;
 color:white;
 font-family:Arial;
-margin:0;
 text-align:center;
 
 }
@@ -21,7 +21,7 @@ margin:5px;
 padding:10px 15px;
 border:none;
 border-radius:6px;
-background:#3b82f6;
+background:#2563eb;
 color:white;
 cursor:pointer;
 
@@ -36,7 +36,7 @@ margin-top:30px;
 
 }
 
-.videoBox{
+.box{
 
 background:#020617;
 padding:15px;
@@ -71,14 +71,14 @@ border-radius:10px;
 
 }
 
-.chatInput{
+.input{
 
 display:flex;
 margin-top:10px;
 
 }
 
-.chatInput input{
+.input input{
 
 flex:1;
 padding:10px;
@@ -87,7 +87,7 @@ border-radius:5px;
 
 }
 
-.chatInput button{
+.input button{
 
 padding:10px;
 margin-left:5px;

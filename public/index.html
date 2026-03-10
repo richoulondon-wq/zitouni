@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Video Chat</title>
+<title>Random Video Chat</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -29,14 +29,14 @@
 
 <div class="videos">
 
-<div class="videoBox">
+<div class="box">
 
 <h3>You</h3>
 <video id="localVideo" autoplay muted playsinline></video>
 
 </div>
 
-<div class="videoBox">
+<div class="box">
 
 <h3>Stranger</h3>
 <video id="remoteVideo" autoplay playsinline></video>
@@ -49,9 +49,9 @@
 
 <div id="messages"></div>
 
-<div class="chatInput">
+<div class="input">
 
-<input id="msg" placeholder="Type message">
+<input id="msg" placeholder="Message">
 
 <button onclick="sendMessage()">Send</button>
 
@@ -63,5 +63,4 @@
 <script src="script.js"></script>
 
 </body>
-
 </html>

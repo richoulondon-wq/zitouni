@@ -6,29 +6,25 @@ const io = require("socket.io")(http)
 
 app.use(express.static(path.join(__dirname,"public")))
 
-app.get("/",(req,res)=>{
-res.sendFile(path.join(__dirname,"public","index.html"))
-})
-
-let waitingUser = null
+let waiting = null
 
 io.on("connection",socket=>{
 
 socket.on("find",()=>{
 
-if(waitingUser && waitingUser !== socket){
+if(waiting && waiting !== socket){
 
-socket.partner = waitingUser
-waitingUser.partner = socket
+socket.partner = waiting
+waiting.partner = socket
 
 socket.emit("matched")
-waitingUser.emit("matched")
+waiting.emit("matched")
 
-waitingUser = null
+waiting = null
 
 }else{
 
-waitingUser = socket
+waiting = socket
 
 }
 
@@ -64,7 +60,7 @@ if(socket.partner) socket.partner.emit("message",msg)
 
 socket.on("disconnect",()=>{
 
-if(waitingUser === socket) waitingUser = null
+if(waiting === socket) waiting = null
 
 if(socket.partner){
 
@@ -79,6 +75,4 @@ socket.partner.partner = null
 
 const PORT = process.env.PORT || 10000
 
-http.listen(PORT,()=>{
-console.log("Server running")
-})
+http.listen(PORT,()=>console.log("Server running"))
