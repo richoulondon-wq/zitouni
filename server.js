@@ -1,74 +1,84 @@
-const express = require("express");
-const path = require("path");
-const app = express();
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const express = require("express")
+const path = require("path")
+const app = express()
+const http = require("http").createServer(app)
+const io = require("socket.io")(http)
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname,"public")))
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+app.get("/",(req,res)=>{
+res.sendFile(path.join(__dirname,"public","index.html"))
+})
 
-let waitingUser = null;
+let waitingUser = null
 
-io.on("connection", socket => {
+io.on("connection",socket=>{
 
-  socket.on("find", () => {
+socket.on("find",()=>{
 
-    if(waitingUser && waitingUser !== socket){
+if(waitingUser && waitingUser !== socket){
 
-      socket.partner = waitingUser;
-      waitingUser.partner = socket;
+socket.partner = waitingUser
+waitingUser.partner = socket
 
-      socket.emit("matched");
-      waitingUser.emit("matched");
+socket.emit("matched")
+waitingUser.emit("matched")
 
-      waitingUser = null;
+waitingUser = null
 
-    } else {
+}else{
 
-      waitingUser = socket;
+waitingUser = socket
 
-    }
+}
 
-  });
+})
 
-  socket.on("next", () => {
+socket.on("next",()=>{
 
-    if(socket.partner){
-      socket.partner.emit("partner-left");
-      socket.partner.partner = null;
-      socket.partner = null;
-    }
+if(socket.partner){
 
-  });
+socket.partner.emit("partner-left")
+socket.partner.partner = null
+socket.partner = null
 
-  socket.on("offer", data => {
-    if(socket.partner) socket.partner.emit("offer", data);
-  });
+}
 
-  socket.on("answer", data => {
-    if(socket.partner) socket.partner.emit("answer", data);
-  });
+})
 
-  socket.on("ice", data => {
-    if(socket.partner) socket.partner.emit("ice", data);
-  });
+socket.on("offer",data=>{
+if(socket.partner) socket.partner.emit("offer",data)
+})
 
-  socket.on("disconnect", () => {
+socket.on("answer",data=>{
+if(socket.partner) socket.partner.emit("answer",data)
+})
 
-    if(waitingUser === socket) waitingUser = null;
+socket.on("ice",data=>{
+if(socket.partner) socket.partner.emit("ice",data)
+})
 
-    if(socket.partner){
-      socket.partner.emit("partner-left");
-      socket.partner.partner = null;
-    }
+socket.on("message",msg=>{
+if(socket.partner) socket.partner.emit("message",msg)
+})
 
-  });
+socket.on("disconnect",()=>{
 
-});
+if(waitingUser === socket) waitingUser = null
 
-const PORT = process.env.PORT || 10000;
+if(socket.partner){
 
-http.listen(PORT, () => console.log("Server running"));
+socket.partner.emit("partner-left")
+socket.partner.partner = null
+
+}
+
+})
+
+})
+
+const PORT = process.env.PORT || 10000
+
+http.listen(PORT,()=>{
+console.log("Server running")
+})
