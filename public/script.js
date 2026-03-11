@@ -56,7 +56,6 @@ socket.emit("ice",e.candidate)
 }
 
 }
-
 function findUser(){
 socket.emit("find")
 }
@@ -160,4 +159,5 @@ function toggleMic(){
 localStream.getAudioTracks()[0].enabled =
 !localStream.getAudioTracks()[0].enabled
 }
+
 
