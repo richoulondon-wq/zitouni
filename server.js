@@ -31,7 +31,10 @@ partner.emit("status","Connected")
 
 }else{
 
+if(!queue.includes(socket)){
 queue.push(socket)
+}
+
 socket.emit("status","Searching for partner...")
 
 }
@@ -42,12 +45,14 @@ socket.on("next",()=>{
 
 if(socket.partner){
 
-socket.partner.emit("partner-left")
-socket.partner.partner=null
+const partner = socket.partner
+
+partner.emit("partner-left")
+partner.partner = null
+
+socket.partner = null
 
 }
-
-socket.partner=null
 
 })
 
@@ -82,4 +87,4 @@ socket.partner.partner=null
 
 const PORT = process.env.PORT || 10000
 
-http.listen(PORT,()=>console.log("Server running"))
+http.listen(PORT,()=>console.log("Server running on "+PORT))
