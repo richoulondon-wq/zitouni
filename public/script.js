@@ -19,7 +19,7 @@ localVideo.srcObject = stream
 
 function createPeer(){
 
-const peer = new RTCPeerConnection({
+peer = new RTCPeerConnection({
 
 iceServers: [
 
@@ -160,3 +160,4 @@ function toggleMic(){
 localStream.getAudioTracks()[0].enabled =
 !localStream.getAudioTracks()[0].enabled
 }
+
