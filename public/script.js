@@ -7,22 +7,29 @@ const localVideo = document.getElementById("localVideo")
 const remoteVideo = document.getElementById("remoteVideo")
 const status = document.getElementById("status")
 
-/* ---------- GET CAMERA ---------- */
+/* CAMERA */
 
 async function startCamera(){
 
 try{
 
 localStream = await navigator.mediaDevices.getUserMedia({
-video:true,
+
+video:{
+width:640,
+height:480,
+frameRate:24
+},
+
 audio:true
+
 })
 
 localVideo.srcObject = localStream
 
 }catch(e){
 
-alert("Camera or microphone permission denied")
+alert("Camera or microphone not allowed")
 
 }
 
@@ -30,13 +37,13 @@ alert("Camera or microphone permission denied")
 
 startCamera()
 
-/* ---------- CREATE PEER ---------- */
+/* CREATE PEER */
 
 function createPeer(){
 
 peer = new RTCPeerConnection({
 
-iceServers: [
+iceServers:[
 
 { urls:"stun:stun.l.google.com:19302" },
 
@@ -60,21 +67,19 @@ credential:"openrelayproject"
 
 ]
 
-/* SEND LOCAL STREAM */
-
-localStream.getTracks().forEach(track=>{
-peer.addTrack(track,localStream)
 })
 
-/* RECEIVE REMOTE STREAM */
+localStream.getTracks().forEach(track=>{
+
+peer.addTrack(track,localStream)
+
+})
 
 peer.ontrack = (event)=>{
 
 remoteVideo.srcObject = event.streams[0]
 
 }
-
-/* SEND ICE */
 
 peer.onicecandidate = (event)=>{
 
@@ -86,8 +91,6 @@ socket.emit("ice",event.candidate)
 
 }
 
-/* CONNECTION STATUS */
-
 peer.onconnectionstatechange = ()=>{
 
 if(peer.connectionState === "connected"){
@@ -96,17 +99,18 @@ status.innerText = "Connected"
 
 }
 
-if(peer.connectionState === "disconnected"){
+if(peer.connectionState === "failed"){
 
-status.innerText = "Disconnected"
+status.innerText = "Connection failed"
+nextUser()
+
+}
 
 }
 
 }
 
-}
-
-/* ---------- FIND USER ---------- */
+/* FIND */
 
 function findUser(){
 
@@ -116,7 +120,7 @@ socket.emit("find")
 
 }
 
-/* ---------- NEXT USER ---------- */
+/* NEXT */
 
 function nextUser(){
 
@@ -139,7 +143,7 @@ socket.emit("find")
 
 }
 
-/* ---------- SOCKET EVENTS ---------- */
+/* SOCKET EVENTS */
 
 socket.on("status",(msg)=>{
 
@@ -204,7 +208,7 @@ status.innerText = "Partner left"
 
 })
 
-/* ---------- CHAT ---------- */
+/* CHAT */
 
 function sendMessage(){
 
@@ -236,11 +240,9 @@ messages.scrollTop = messages.scrollHeight
 
 }
 
-/* ---------- CAMERA TOGGLE ---------- */
+/* CAMERA */
 
 function toggleCamera(){
-
-if(!localStream) return
 
 const track = localStream.getVideoTracks()[0]
 
@@ -248,15 +250,12 @@ track.enabled = !track.enabled
 
 }
 
-/* ---------- MIC TOGGLE ---------- */
+/* MIC */
 
 function toggleMic(){
-
-if(!localStream) return
 
 const track = localStream.getAudioTracks()[0]
 
 track.enabled = !track.enabled
 
 }
-
