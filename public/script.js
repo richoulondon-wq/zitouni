@@ -40,9 +40,9 @@ localStream.getTracks().forEach(track=>{
 peer.addTrack(track,localStream)
 })
 
-peer.ontrack = e=>{
-remoteVideo.srcObject = e.streams[0]
-}
+peer.ontrack = (event)=>{
+  remoteVideo.srcObject = event.streams[0];
+};
 
 peer.onicecandidate = e=>{
 if(e.candidate){
@@ -156,3 +156,4 @@ localStream.getAudioTracks()[0].enabled =
 !localStream.getAudioTracks()[0].enabled
 
 }
+
