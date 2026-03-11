@@ -1,104 +1,76 @@
 const express = require("express")
 const path = require("path")
 const app = express()
-
 const http = require("http").createServer(app)
 const io = require("socket.io")(http)
 
 app.use(express.static(path.join(__dirname,"public")))
 
 let queue = []
+let onlineUsers = 0
 
-io.on("connection",(socket)=>{
+io.on("connection", (socket) => {
 
-socket.emit("status","Connected")
+  onlineUsers++
+  io.emit("online", onlineUsers)
 
-/* FIND PARTNER */
+  socket.emit("status","Connected")
 
-socket.on("find",()=>{
+  socket.on("find", (data) => {
 
-queue = queue.filter(s=>s!==socket)
+    socket.username = data?.username || "Anonymous"
+    socket.country = data?.country || ""
+    socket.gender = data?.gender || ""
 
-if(queue.length > 0){
+    queue = queue.filter(s => s !== socket)
 
-const partner = queue.shift()
+    let partnerIndex = queue.findIndex(u => {
+      return (!socket.country || !u.country || u.country === socket.country) &&
+             (!socket.gender || !u.gender || u.gender === socket.gender)
+    })
 
-socket.partner = partner
-partner.partner = socket
+    if (partnerIndex !== -1) {
+      const partner = queue.splice(partnerIndex, 1)[0]
+      socket.partner = partner
+      partner.partner = socket
 
-socket.emit("matched")
-partner.emit("matched")
+      // إرسال اسم الشريك عند المطابقة
+      socket.emit("matched", { username: partner.username })
+      partner.emit("matched", { username: socket.username })
 
-socket.emit("status","Connected")
-partner.emit("status","Connected")
+      socket.emit("status","Connected")
+      partner.emit("status","Connected")
+    } else {
+      queue.push(socket)
+      socket.emit("status","Searching for partner...")
+    }
+  })
 
-}else{
+  socket.on("next", () => {
+    if (socket.partner) {
+      socket.partner.emit("partner-left")
+      socket.partner.partner = null
+      socket.partner = null
+    }
+  })
 
-queue.push(socket)
-socket.emit("status","Searching for partner...")
+  socket.on("offer", data => { if(socket.partner) socket.partner.emit("offer", data) })
+  socket.on("answer", data => { if(socket.partner) socket.partner.emit("answer", data) })
+  socket.on("ice", data => { if(socket.partner) socket.partner.emit("ice", data) })
+  socket.on("message", msg => { if(socket.partner) socket.partner.emit("message", msg) })
 
-}
+  socket.on("disconnect", () => {
+    onlineUsers--
+    io.emit("online", onlineUsers)
 
-})
-
-/* NEXT USER */
-
-socket.on("next",()=>{
-
-if(socket.partner){
-
-const partner = socket.partner
-
-partner.emit("partner-left")
-partner.partner = null
-
-socket.partner = null
-
-}
-
-})
-
-/* SIGNALING */
-
-socket.on("offer",(data)=>{
-if(socket.partner) socket.partner.emit("offer",data)
-})
-
-socket.on("answer",(data)=>{
-if(socket.partner) socket.partner.emit("answer",data)
-})
-
-socket.on("ice",(data)=>{
-if(socket.partner) socket.partner.emit("ice",data)
-})
-
-/* CHAT */
-
-socket.on("message",(msg)=>{
-if(socket.partner) socket.partner.emit("message",msg)
-})
-
-/* DISCONNECT */
-
-socket.on("disconnect",()=>{
-
-queue = queue.filter(s=>s!==socket)
-
-if(socket.partner){
-
-socket.partner.emit("partner-left")
-socket.partner.partner = null
-
-}
-
-})
+    queue = queue.filter(s => s !== socket)
+    if (socket.partner) {
+      socket.partner.emit("partner-left")
+      socket.partner.partner = null
+    }
+  })
 
 })
 
 const PORT = process.env.PORT || 10000
-
-http.listen(PORT,()=>{
-
-console.log("Server running on port "+PORT)
-
-})
+http.listen(PORT, () => console.log("Server running on " + PORT))
