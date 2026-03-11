@@ -20,29 +20,34 @@ localVideo.srcObject = stream
 function createPeer(){
 
 const peer = new RTCPeerConnection({
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
 
-    {
-      urls: "turn:openrelay.metered.ca:80",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    },
+iceServers: [
 
-    {
-      urls: "turn:openrelay.metered.ca:443",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    }
-  ]
+{ urls: "stun:stun.l.google.com:19302" },
+
+{
+urls: "turn:openrelay.metered.ca:80",
+username: "openrelayproject",
+credential: "openrelayproject"
+},
+
+{
+urls: "turn:openrelay.metered.ca:443",
+username: "openrelayproject",
+credential: "openrelayproject"
+}
+
+]
+
 });
+
 localStream.getTracks().forEach(track=>{
 peer.addTrack(track,localStream)
 })
 
 peer.ontrack = (event)=>{
-  remoteVideo.srcObject = event.streams[0];
-};
+remoteVideo.srcObject = event.streams[0];
+}
 
 peer.onicecandidate = e=>{
 if(e.candidate){
@@ -154,6 +159,4 @@ localStream.getVideoTracks()[0].enabled =
 function toggleMic(){
 localStream.getAudioTracks()[0].enabled =
 !localStream.getAudioTracks()[0].enabled
-
 }
-
